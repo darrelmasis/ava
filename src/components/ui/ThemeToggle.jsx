@@ -1,19 +1,19 @@
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../hooks/useTheme'
 
 export function ThemeToggle() {
-  const { toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme()
 
   return (
     <button
       onClick={toggleTheme}
-      className="fixed top-4 right-4 p-3 rounded-full bg-secondary hover:bg-secondary/80 transition-all duration-300 ease-in-out shadow-lg z-50"
+      className="fixed top-4 right-4 p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 shadow-lg z-50"
       aria-label={`Cambiar a modo ${isDark ? 'claro' : 'oscuro'}`}
       title={`Cambiar a modo ${isDark ? 'claro' : 'oscuro'}`}
     >
       {isDark ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-foreground"
+          className="h-6 w-6 text-gray-900 dark:text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -28,7 +28,7 @@ export function ThemeToggle() {
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-foreground"
+          className="h-6 w-6 text-gray-900 dark:text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -42,6 +42,5 @@ export function ThemeToggle() {
         </svg>
       )}
     </button>
-  );
+  )
 }
-
