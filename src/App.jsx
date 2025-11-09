@@ -1,29 +1,30 @@
-import { useState } from 'react';
-import { ThemeToggle } from './components/ui/ThemeToggle';
+import { useState } from 'react'
+import { ThemeToggle } from './components/ui/ThemeToggle'
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-8 transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-neutral-900 text-gray-900 dark:text-lime-500 flex flex-col items-center justify-center p-8">
       <ThemeToggle />
-      <h1 className="text-4xl font-bold mb-8 transition-colors duration-300">
-        Vite + React
-      </h1>
-      <div className="bg-card border border-border rounded-lg p-8 shadow-lg transition-colors duration-300">
+      <h1 className="text-4xl font-bold mb-8">Vite + React</h1>
+      <div className="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg p-8 shadow-lg">
         <button
           onClick={() => setCount(count => count + 1)}
-          className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 mb-4"
+          className="bg-blue-500 dark:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 dark:hover:bg-blue-700 mb-4"
         >
           count is {count}
         </button>
-        <p className="text-muted-foreground transition-colors duration-300">
-          Edit <code className="bg-muted px-2 py-1 rounded transition-colors duration-300">src/App.jsx</code> and
-          save to test HMR
+        <p className="text-gray-600 dark:text-gray-400">
+          Edit{' '}
+          <code className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+            src/App.jsx
+          </code>{' '}
+          and save to test HMR
         </p>
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
