@@ -17,7 +17,7 @@ const salesAuditSchema = new Schema(
 
     config: {
       exchangeRate: { type: Number, required: true }, // tipo de cambio definido en la configuración del arqueo
-      routeNumber: { type: String, required: true }, // número de ruta (definida por ventas)
+      routeNumber: { type: Number, required: true }, // número de ruta (definida por ventas)
       routeAuxiliary: [{ type: String }], // nombres de auxiliare(s) de la ruta
       truckNumber: { type: String, required: true }, // número de unidad ej. U125
       licensePlate: { type: String, required: true }, // placa del camión ej. GR-5234
@@ -48,11 +48,19 @@ const salesAuditSchema = new Schema(
       },
     },
 
+    /* Los documentos asociados al arqueo de ventas recibirán los siguientes campos:
+      date: Fecha del documento
+      refNumber: Número de referencia (número de cheque, número de transferencia, etc.)
+      bank: Banco emisor
+      amount: Monto total del documento
+      currency: Moneda del documento (Córdobas o Dólares) [NIO, USD]
+      customerName: Nombre del cliente
+    */
     documents: {
-      checks: [mongoose.Schema.Types.Mixed], // cheques
-      transfers: [mongoose.Schema.Types.Mixed], // transferencias bancarias
-      deposits: [mongoose.Schema.Types.Mixed], // depósitos
-      others: [mongoose.Schema.Types.Mixed], // otros tipos de pago/documentos
+      checks: [Schema.Types.Mixed], // cheques
+      transfers: [Schema.Types.Mixed], // transferencias bancarias
+      deposits: [Schema.Types.Mixed], // depósitos
+      others: [Schema.Types.Mixed], // otros tipos de pago/documentos
     },
 
     // 6️⃣ Billing / Invoicing

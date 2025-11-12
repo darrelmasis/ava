@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
-import { connectDB } from '../../server/config/db_connection.js'
-import { getCorsHeaders } from '../../server/utils/cors.js'
+import { connectDB } from '../config/db_connection.js'
+import { getCorsHeaders } from '../utils/cors.js'
 import 'dotenv/config'
 import handleGetRequest from './_GET.js'
 import handlePostRequest from './_POST.js'
-// import handlePatchRequest from './_PATCH.js'
-// import handleDeleteRequest from './_DELETE.js'
-import { verifyToken } from '../../server/utils/verifyToken.js'
+import handlePatchRequest from './_PATCH.js'
+import handleDeleteRequest from './_DELETE.js'
+import { verifyToken } from '../utils/verifyToken.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)
@@ -23,8 +23,6 @@ const handler = async (req, res) => {
   if (!loguedUser)
     return res.status(401).json({ message: 'No autorizado. Token inválido.' })
 
-  const { role } = loguedUser
-
   try {
     await connectDB()
     const salesAuditCollection =
@@ -34,11 +32,11 @@ const handler = async (req, res) => {
       case 'GET':
         return await handleGetRequest(req, res, salesAuditCollection)
       case 'POST':
-        return await handlePostRequest(req, res, salesAuditCollection, role)
+        return await handlePostRequest(req, res, loguedUser)
       case 'PATCH':
-        return await handlePatchRequest(req, res, salesAuditCollection)
+        return await handlePatchRequest(req, res, salesAuditCollection, loguedUser)
       case 'DELETE':
-        return await handleDeleteRequest(req, res, salesAuditCollection)
+        return await handleDeleteRequest(req, res, salesAuditCollection, loguedUser)
 
       default:
         return res.status(405).json({ error: 'Método no permitido' })
