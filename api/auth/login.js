@@ -1,9 +1,9 @@
-import { connectDB } from '../../server/config/db_connection.js'
-import User from '../../server/models/User.js'
+import { connectDB } from '../config/db_connection.js'
+import User from '../models/User.model.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
-import { getCorsHeaders } from '../../server/utils/cors.js'
+import { getCorsHeaders } from '../utils/cors.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)
@@ -18,10 +18,10 @@ const handler = async (req, res) => {
   if (METHOD !== 'POST')
     return res.status(405).json({ message: 'Método no permitido' })
 
+  const { username, password, rememberMe } = req.body
+
   if (!username || !password)
     return res.status(400).json({ message: 'Credenciales Obligatorias' })
-
-  const { username, password, rememberMe } = req.body
   const expiresIn = rememberMe ? '30d' : '1h'
   const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 1 * 60 * 60
 
