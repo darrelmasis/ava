@@ -19,15 +19,11 @@
 }
 
 /* === Reset === */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
 html,
 body,
 #root {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
   min-height: 100vh;
   font-family:
     system-ui,
@@ -38,13 +34,13 @@ body,
     'Helvetica Neue',
     Arial,
     sans-serif;
+  @apply bg-neutral-100 dark:bg-neutral-900;
 }
 
-/* === Transiciones suaves para cambio de tema === */
-*,
-*::before,
-*::after {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
+
+@layer base {
+  button:not([disabled]),
+  [role='button']:not([disabled]) {
+    cursor: pointer;
+  }
 }
