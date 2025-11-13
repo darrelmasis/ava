@@ -1,0 +1,49 @@
+{
+  "id": "AUDIT-0001",
+  "sellerId": "609e129e1c4ae34d2c8f9b55",
+  "config": {
+    "exchangeRate": 36.50,
+    "routeNumber": 12,
+    "truckNumber": 123,
+    "licensePlate": "M-123456",
+    "routeAuxiliary": ["Juan Pérez", "Carlos López"]
+  },
+  "cashCount": {
+    "cordobas": {
+      "1000": 24,
+      "500": 16,
+      "200": 10,
+      "100": 56,
+      "50": 20,
+      "20": 35,
+      "10": 28
+    },
+    "dollars": {
+      "20": 5
+    }
+  },
+  "documents": {
+    "checks": [
+      {
+        "date": "2024-06-15",
+        "refNumber": "CHK-001",
+        "bank": "BAC Credomatic",
+        "amount": 1500,
+        "currency": "NIO",
+        "customerName": "María Gómez"
+      }
+    ],
+    "transfers": [],
+    "deposits": [],
+    "others": []
+  },
+  "invoices": {
+    "start": "FR02-1000",
+    "end": "FR02-1049",
+    "quantity": 50,
+    "totalAmount": 25000
+  },
+  "manualInvoices": {},
+  "creditInvoices": {},
+  "receipts": {}
+}
