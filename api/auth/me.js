@@ -1,7 +1,7 @@
-import { verifyToken } from '../../server/utils/auth.js' // ← Función común
-import { connectDB } from '../../server/config/db_connection'
-import User from '../../server/models/User'
-import { getCorsHeaders } from '../../server/utils/cors'
+import { verifyToken } from '../utils/verifyToken.js'
+import { connectDB } from '../config/db_connection.js'
+import User from '../models/User.model.js'
+import { getCorsHeaders } from '../utils/cors.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)

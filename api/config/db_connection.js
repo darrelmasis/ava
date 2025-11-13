@@ -26,7 +26,7 @@ export const connectDB = async () => {
     cached.conn = await cached.promise
 
     if (!cached.logged) {
-      console.log(
+      console.info(
         'MongoDB conectado satisfactoriamente:',
         new Date().toLocaleString('es-NI')
       )
@@ -34,7 +34,7 @@ export const connectDB = async () => {
     }
   } catch (err) {
     cached.promise = null
-    console.log('Error al conectarse a MongoDB')
+    console.error('Error al conectarse a MongoDB')
     throw err
   }
 

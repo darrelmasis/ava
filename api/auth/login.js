@@ -49,6 +49,11 @@ const handler = async (req, res) => {
 
     return res.status(200).json({
       message: 'Sesión iniciada con éxito',
+      user: {
+        id: user._id,
+        username: user.userName,
+        role: user.role,
+      },
     })
   } catch (error) {
     console.error('Error al iniciar sesión', error)
