@@ -1,7 +1,7 @@
-import { verifyToken } from '../utils/verifyToken.js'
-import { connectDB } from '../config/db_connection.js'
-import User from '../models/User.model.js'
-import { getCorsHeaders } from '../utils/cors.js'
+import { verifyToken } from '../_utils/verifyToken.js'
+import { connectDB } from '../_config/db_connection.js'
+import User from '../_models/User.model.js'
+import { getCorsHeaders } from '../_utils/cors.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)

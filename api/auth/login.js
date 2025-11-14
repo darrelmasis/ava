@@ -1,9 +1,9 @@
-import { connectDB } from '../config/db_connection.js'
-import User from '../models/User.model.js'
+import { connectDB } from '../_config/db_connection.js'
+import User from '../_models/User.model.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import 'dotenv/config'
-import { getCorsHeaders } from '../utils/cors.js'
+import { getCorsHeaders } from '../_utils/cors.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)

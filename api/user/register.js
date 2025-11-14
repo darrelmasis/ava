@@ -1,8 +1,8 @@
-import { connectDB } from '../config/db_connection.js'
-import User from '../models/User.model.js'
-import { getCorsHeaders } from '../utils/cors.js'
+import { connectDB } from '../_config/db_connection.js'
+import User from '../_models/User.model.js'
+import { getCorsHeaders } from '../_utils/cors.js'
 import bcrypt from 'bcryptjs'
-import { validateFields } from '../utils/validateFields.js'
+import { validateFields } from '../_utils/validateFields.js'
 
 const buildValidationSchema = body => ({
   fullName: { value: body.fullName?.trim(), type: 'text' },

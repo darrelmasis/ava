@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import SalesAudit from '../models/SalesAudit.model.js'
+import SalesAudit from '../_models/SalesAudit.model.js'
 
 const handlePostRequest = async (req, res, loguedUser) => {
   try {

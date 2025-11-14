@@ -1,5 +1,5 @@
-import { getCorsHeaders } from '../utils/cors.js'
-import { verifyToken } from '../utils/verifyToken.js'
+import { getCorsHeaders } from '../_utils/cors.js'
+import { verifyToken } from '../_utils/verifyToken.js'
 
 export default function handler(req, res) {
   const CORS_HEADERS = getCorsHeaders(req)

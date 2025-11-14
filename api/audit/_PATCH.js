@@ -1,4 +1,4 @@
-import SalesAudit from '../models/SalesAudit.model.js'
+import SalesAudit from '../_models/SalesAudit.model.js'
 
 const handlePatchRequest = async (req, res, collection, usuario) => {
   try {

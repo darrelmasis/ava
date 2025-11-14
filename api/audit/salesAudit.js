@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
-import { connectDB } from '../config/db_connection.js'
-import { getCorsHeaders } from '../utils/cors.js'
+import { connectDB } from '../_config/db_connection.js'
+import { getCorsHeaders } from '../_utils/cors.js'
 import 'dotenv/config'
 import handleGetRequest from './_GET.js'
 import handlePostRequest from './_POST.js'
 import handlePatchRequest from './_PATCH.js'
 import handleDeleteRequest from './_DELETE.js'
-import { verifyToken } from '../utils/verifyToken.js'
+import { verifyToken } from '../_utils/verifyToken.js'
 
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)
