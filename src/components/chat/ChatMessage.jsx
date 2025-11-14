@@ -22,7 +22,10 @@ const renderTextWithEmojis = text => {
 
     // Agregar el emoji envuelto en un span con fuente más grande
     parts.push(
-      <span key={match.index} className="inline-block text-2xl leading-none align-middle">
+      <span
+        key={match.index}
+        className="inline-block text-2xl leading-none align-middle"
+      >
         {match[0]}
       </span>
     )
@@ -129,10 +132,7 @@ export default function ChatMessage({
       {/* Avatar derecho */}
       <div className="flex-shrink-0">
         {isFirstInGroup ? (
-          <Avatar
-            name={user?.fullName || user?.userName || 'Tú'}
-            size="sm"
-          />
+          <Avatar name={user?.fullName || user?.userName || 'Tú'} size="sm" />
         ) : (
           <div className="w-8"></div>
         )}
@@ -140,4 +140,3 @@ export default function ChatMessage({
     </div>
   )
 }
-

@@ -11,12 +11,12 @@ export default function ChatMessageList({
   const hasMessages = groupedMessages.length > 0
 
   return (
-    <div className="chat-messages-container">
+    <div className="chat-messages-container overflow-y-auto px-4 h-[calc(100vh-215px)] flex place-items-center justify-center">
       {!hasMessages ? (
-        <>
+        <div className="flex flex-col items-center justify-center text-center">
           <ChatEmpty />
           <div ref={messagesEndRef} aria-hidden="true" style={{ height: 0 }} />
-        </>
+        </div>
       ) : (
         <>
           {groupedMessages.map(group => (
@@ -48,4 +48,3 @@ export default function ChatMessageList({
     </div>
   )
 }
-

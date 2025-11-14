@@ -15,12 +15,8 @@ export default function Chat() {
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
 
-  const {
-    messages,
-    isConnected,
-    connectionError,
-    sendMessage,
-  } = useChatSocket()
+  const { messages, isConnected, connectionError, sendMessage } =
+    useChatSocket()
 
   const groupedMessages = useGroupedMessages(messages)
 
@@ -67,7 +63,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col bg-neutral-100 dark:bg-neutral-950 max-w-3xl mx-auto">
+    <div className="flex flex-col bg-neutral-100 dark:bg-neutral-900 max-w-3xl mx-auto h-[calc(100vh-71px)]">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -94,7 +90,13 @@ export default function Chat() {
       <main
         ref={messagesContainerRef}
         key="chat-messages-main"
-        className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[calc(100dvh-207px)]"
+        className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:rounded-full
+  [&::-webkit-scrollbar-track]:bg-gray-100
+  [&::-webkit-scrollbar-thumb]:rounded-full
+  [&::-webkit-scrollbar-thumb]:bg-gray-300
+  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
       >
         <ChatMessageList
           key={`chat-messages-${groupedMessages.length}`}
