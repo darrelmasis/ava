@@ -5,6 +5,7 @@ import ProtectedRoute from '../utils/ProtectedRoutes'
 import PublicRoute from '../utils/PublicRoutes'
 import NotFoundPage from '../pages/NotFound' // Asegúrate de tener esta página
 import UserProfile from '../pages/Profile' // Página de perfil de usuario
+import Chat from '../pages/Chat' // Página de chat
 
 const AppRoutes = () => {
   const { user } = useAuth()
@@ -19,17 +20,22 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Ruta 404 pública */}
+      <Route path="/404" element={<NotFoundPage />} />
+
       <Route element={<ProtectedRoute />}>
-        {/* Ruta dinámica del perfil */}
-        <Route path="/:username" element={<UserProfile />} />
+        {/* Ruta del perfil */}
+        <Route path="/me/:username" element={<UserProfile />} />
+        {/* Ruta del chat */}
+        <Route path="/chat" element={<Chat />} />
       </Route>
 
-      {/* Redirección por defecto al username */}
+      {/* Redirección por defecto al perfil del usuario */}
       <Route
         path="/"
         element={
           user ? (
-            <Navigate to={`/${user.username}`} replace />
+            <Navigate to={`/me/${user.userName}`} replace />
           ) : (
             <Navigate to="/login" replace />
           )

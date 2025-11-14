@@ -12,8 +12,8 @@ export default function PublicRoute({ children }) {
   }
 
   // Si ya hay un usuario logueado, redirige al perfil
-  if (user) {
-    return <Navigate to={`/${user.userName}`} replace />
+  if (user && user.userName) {
+    return <Navigate to={`/me/${user.userName}`} replace />
   }
 
   // Si no hay usuario, renderiza el contenido (por ejemplo, LoginPage)

@@ -8,11 +8,11 @@ const Loader = ({ className }) => {
   )
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-neutral-900 bg-opacity-70 z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-neutral-900 bg-opacity-70 z-50">
       <div role="status">
         <svg
           aria-hidden="true"
-          class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+          className="w-16 h-16 text-neutral-200 animate-spin dark:text-neutral-600 fill-lime-500"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +26,9 @@ const Loader = ({ className }) => {
             fill="currentFill"
           />
         </svg>
-        <span class="sr-only">Loading...</span>
+        <span className="mt-8 text-neutral-200 dark:text-neutral-600">
+          Cargando...
+        </span>
       </div>
     </div>
   )

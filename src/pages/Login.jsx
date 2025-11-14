@@ -6,13 +6,12 @@ import Logo from '@/assets/logo.svg'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Alert from '../components/ui/Alert'
-import { ThemeToggle } from '../components/ui/ThemeToggle'
 import Box from '../components/layout/Box'
 import Checkbox from '../components/ui/Checkbox'
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, user } = useAuth()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -63,8 +62,12 @@ const LoginPage = () => {
           localStorage.removeItem('rememberedUsername')
         }
 
-        if (response.user?.username) {
-          navigate(`/${response.user.username}`)
+        // Navegar al perfil del usuario usando el userName de la respuesta
+        // El login ya actualiza el estado del usuario en AuthContext
+        // Aceptar tanto userName como username (por compatibilidad)
+        const userName = response.user?.userName || response.user?.username
+        if (userName) {
+          navigate(`/me/${userName}`)
         } else {
           console.error('Username no disponible en la respuesta:', response)
           setError('No se pudo determinar el usuario autenticado.')
@@ -81,7 +84,6 @@ const LoginPage = () => {
 
   return (
     <>
-      <ThemeToggle />
       <div className="min-h-screen flex justify-center items-center px-4 bg-gradient-to-br from-lime-50 via-white to-lime-100 dark:from-neutral-800 dark:via-neutral-900 dark:to-lime-900/20 transition-colors duration-200">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-6xl items-center">
           {/* Sección de imagen con mejoras */}

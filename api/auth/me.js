@@ -18,6 +18,7 @@ const handler = async (req, res) => {
     const decoded = verifyToken(req)
 
     if (!decoded) {
+      console.log('Token no válido o no encontrado en /api/auth/me')
       return res.status(401).json({ message: 'Usuario no autenticado' })
     }
 
@@ -25,6 +26,7 @@ const handler = async (req, res) => {
     const user = await User.findById(decoded.id).select('-password')
 
     if (!user) {
+      console.log('Usuario no encontrado en BD para ID:', decoded.id)
       res.setHeader(
         'Set-Cookie',
         'token=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0'
@@ -32,7 +34,13 @@ const handler = async (req, res) => {
       return res.status(401).json({ message: 'Usuario no encontrado' })
     }
 
-    res.status(200).json(user)
+    console.log('Sesión recuperada exitosamente para:', user.userName)
+
+    res.status(200).json({
+      user,
+      rememberMe: decoded?.rememberMe === true,
+      tokenExpiresAt: decoded?.exp ? decoded.exp * 1000 : null,
+    })
   } catch (error) {
     console.error('Error en /api/auth/me: ', error)
 

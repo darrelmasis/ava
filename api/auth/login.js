@@ -8,8 +8,8 @@ import { getCorsHeaders } from '../utils/cors.js'
 const handler = async (req, res) => {
   const CORS_HEADERS = getCorsHeaders(req)
 
-  Object.entries(CORS_HEADERS).forEach(([keyframes, value]) =>
-    res.setHeader(keyframes, value)
+  Object.entries(CORS_HEADERS).forEach(([key, value]) =>
+    res.setHeader(key, value)
   )
 
   const METHOD = req.method
@@ -22,8 +22,6 @@ const handler = async (req, res) => {
 
   if (!username || !password)
     return res.status(400).json({ message: 'Credenciales Obligatorias' })
-  const expiresIn = rememberMe ? '30d' : '1h'
-  const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 1 * 60 * 60
 
   try {
     await connectDB()
@@ -36,24 +34,48 @@ const handler = async (req, res) => {
     if (!isPasswordMatch)
       return res.status(401).json({ message: 'Contraseña Incorrecta' })
 
+    // Configuración de expiración según rememberMe
+    const expiresIn = rememberMe ? '30d' : '30d' // Token largo siempre (el frontend controla inactividad)
+    const maxAgeSeconds = rememberMe ? 30 * 24 * 60 * 60 : 30 * 24 * 60 * 60 // Cookie larga siempre
+
     const token = jwt.sign(
-      { id: user._id, username: user.userName, role: user.role },
+      { 
+        id: user._id, 
+        username: user.userName, 
+        role: user.role,
+        rememberMe: rememberMe === true // Guardar rememberMe en el token
+      },
       process.env.JWT_SECRET,
-      { expiresIn: expiresIn }
+      { expiresIn }
     )
+
+    const expiresAt = new Date(Date.now() + maxAgeSeconds * 1000)
 
     res.setHeader(
       'Set-Cookie',
-      `token=${token}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age${maxAge}`
+      [
+        `token=${token}`,
+        'Path=/',
+        'HttpOnly',
+        'Secure',
+        'SameSite=None',
+        `Max-Age=${maxAgeSeconds}`,
+        `Expires=${expiresAt.toUTCString()}`,
+      ].join('; ')
     )
 
     return res.status(200).json({
       message: 'Sesión iniciada con éxito',
       user: {
         id: user._id,
-        username: user.userName,
+        userName: user.userName,
+        fullName: user.fullName,
+        email: user.email,
         role: user.role,
+        createdAt: user.createdAt,
       },
+      rememberMe, // Enviar rememberMe al frontend
+      tokenExpiresAt: expiresAt.getTime(),
     })
   } catch (error) {
     console.error('Error al iniciar sesión', error)
