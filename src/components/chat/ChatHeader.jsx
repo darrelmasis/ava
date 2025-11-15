@@ -1,3 +1,5 @@
+import { useChatSocket } from '../../hooks/chat/useChatSocket'
+
 export default function ChatHeader({ isConnected, user }) {
   return (
     <header className="p-4 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">

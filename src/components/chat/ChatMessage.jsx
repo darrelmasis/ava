@@ -1,30 +1,46 @@
+import { useMemo } from 'react'
 import Avatar from '../commons/Avatar'
 
-// Función para detectar y renderizar emojis más grandes
-const renderTextWithEmojis = text => {
-  if (!text) return text
+// Regex mejorado para detectar emojis (más completo y eficiente)
+// Detecta: emojis Unicode, variantes, secuencias, banderas, etc.
+const EMOJI_REGEX = /([\uD83C-\uDBFF\uDC00-\uDFFF]+|[\u2600-\u27BF])/g;
 
-  // Regex para detectar emojis (incluye emojis Unicode, variantes, y secuencias)
-  const emojiRegex =
-    /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F?|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?)/gu
+// Función optimizada para detectar y renderizar emojis más grandes
+const renderTextWithEmojis = (text, messageId) => {
+  if (!text || typeof text !== 'string') return text
+
+  // Resetear el regex (importante para reutilización)
+  EMOJI_REGEX.lastIndex = 0
+
+  // Verificar rápidamente si hay emojis antes de procesar
+  if (!EMOJI_REGEX.test(text)) {
+    EMOJI_REGEX.lastIndex = 0
+    return text
+  }
+  EMOJI_REGEX.lastIndex = 0
 
   const parts = []
   let lastIndex = 0
   let match
-  let hasEmojis = false
+  let emojiIndex = 0
 
-  while ((match = emojiRegex.exec(text)) !== null) {
-    hasEmojis = true
+  // Buscar todos los emojis
+  while ((match = EMOJI_REGEX.exec(text)) !== null) {
     // Agregar texto antes del emoji
     if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index))
+      const textBefore = text.substring(lastIndex, match.index)
+      if (textBefore) {
+        parts.push(textBefore)
+      }
     }
 
     // Agregar el emoji envuelto en un span con fuente más grande
     parts.push(
       <span
-        key={match.index}
-        className="inline-block text-2xl leading-none align-middle"
+        key={`emoji-${messageId}-${emojiIndex++}`}
+        className="inline-block text-2xl leading-none align-middle mx-0.5"
+        role="img"
+        aria-label="emoji"
       >
         {match[0]}
       </span>
@@ -35,11 +51,14 @@ const renderTextWithEmojis = text => {
 
   // Agregar el texto restante después del último emoji
   if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex))
+    const textAfter = text.substring(lastIndex)
+    if (textAfter) {
+      parts.push(textAfter)
+    }
   }
 
-  // Si no hay emojis, devolver el texto original
-  return hasEmojis ? parts : text
+  // Si no se encontraron emojis, devolver el texto original
+  return parts.length > 0 ? parts : text
 }
 
 export default function ChatMessage({
@@ -54,6 +73,13 @@ export default function ChatMessage({
     hour: '2-digit',
     minute: '2-digit',
   })
+  
+
+  // Memoizar el renderizado de emojis para mejorar el rendimiento
+  const renderedText = useMemo(
+    () => renderTextWithEmojis(message.text, message.id || message.timestamp),
+    [message.text, message.id, message.timestamp]
+  )
 
   // Mensaje de otro usuario
   if (!isOwn) {
@@ -62,7 +88,7 @@ export default function ChatMessage({
         {/* Avatar izquierdo */}
         <div className="flex-shrink-0">
           {isFirstInGroup && showAvatar ? (
-            <Avatar name={message.user || 'Usuario'} size="sm" />
+            <Avatar name={message.user} size="sm" />
           ) : (
             <div className="w-8"></div>
           )}
@@ -72,7 +98,7 @@ export default function ChatMessage({
         <div className="flex flex-col max-w-[70%] items-start">
           {/* Nombre del usuario */}
           {isFirstInGroup && showAvatar && (
-            <div className="mb-1 px-2">
+            <div className="mb-1">
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 {message.user}
               </span>
@@ -86,7 +112,7 @@ export default function ChatMessage({
             } ${isLastInGroup ? 'rounded-bl-sm' : 'rounded-bl-2xl'}`}
           >
             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-              {renderTextWithEmojis(message.text)}
+              {renderedText}
             </p>
           </div>
 
@@ -115,7 +141,7 @@ export default function ChatMessage({
           } ${isLastInGroup ? 'rounded-br-sm' : 'rounded-br-2xl'}`}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-            {renderTextWithEmojis(message.text)}
+            {renderedText}
           </p>
         </div>
 

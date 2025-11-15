@@ -5,18 +5,24 @@ import ChatHeader from '../components/chat/ChatHeader'
 import ChatError from '../components/chat/ChatError'
 import ChatMessageList from '../components/chat/ChatMessageList'
 import ChatInput from '../components/chat/ChatInput'
+import TypingIndicator from '../components/chat/TypingIndicator'
 import { useChatSocket } from '../hooks/chat/useChatSocket'
 import { useGroupedMessages } from '../hooks/chat/useGroupedMessages'
 
 export default function Chat() {
   const { user } = useAuth()
   const [newMessage, setNewMessage] = useState('')
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
 
-  const { messages, isConnected, connectionError, sendMessage } =
-    useChatSocket()
+  const {
+    messages,
+    isConnected,
+    connectionError,
+    sendMessage,
+    typingUsers,
+    sendTyping,
+  } = useChatSocket()
 
   const groupedMessages = useGroupedMessages(messages)
 
@@ -47,11 +53,9 @@ export default function Chat() {
     if (!newMessage.trim() || !isConnected) return
 
     const userId = user?._id || user?.id
-    const userName = user?.userName || 'Usuario'
-
+    const userName = user?.fullName || 'Usuario'
     if (sendMessage(newMessage, userName, userId)) {
       setNewMessage('')
-      setShowEmojiPicker(false)
     }
   }
 
@@ -90,13 +94,7 @@ export default function Chat() {
       <main
         ref={messagesContainerRef}
         key="chat-messages-main"
-        className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2
-  [&::-webkit-scrollbar-track]:rounded-full
-  [&::-webkit-scrollbar-track]:bg-gray-100
-  [&::-webkit-scrollbar-thumb]:rounded-full
-  [&::-webkit-scrollbar-thumb]:bg-gray-300
-  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+        className="relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         <ChatMessageList
           key={`chat-messages-${groupedMessages.length}`}
@@ -105,15 +103,20 @@ export default function Chat() {
           user={user}
           messagesEndRef={messagesEndRef}
         />
+        <TypingIndicator
+          typingUsers={typingUsers}
+          currentUserId={user?._id || user?.id}
+        />
       </main>
+
+      {/* Indicador de usuarios escribiendo - arriba del input */}
 
       <ChatInput
         newMessage={newMessage}
         setNewMessage={setNewMessage}
         onSendMessage={handleSendMessage}
         isConnected={isConnected}
-        showEmojiPicker={showEmojiPicker}
-        setShowEmojiPicker={setShowEmojiPicker}
+        sendTyping={sendTyping}
       />
     </div>
   )

@@ -11,7 +11,7 @@ export default function ChatMessageList({
   const hasMessages = groupedMessages.length > 0
 
   return (
-    <div className="chat-messages-container overflow-y-auto px-4 h-[calc(100vh-215px)] flex place-items-center justify-center">
+    <div className="chat-messages-container overflow-y-auto px-4 h-[calc(100vh-215px)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       {!hasMessages ? (
         <div className="flex flex-col items-center justify-center text-center">
           <ChatEmpty />

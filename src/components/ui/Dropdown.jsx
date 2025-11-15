@@ -189,11 +189,22 @@ export const DropdownItem = ({
   children,
   onClick,
   disabled = false,
-  variant = 'default', // 'default', 'danger', 'disabled'
+  variant = 'default',
   className = '',
-  as = 'button', // 'button', 'a', 'div'
+  closeOnClick = true,
+  as = 'button',
   ...props
 }) => {
+  const { close } = useDropdown() // ← agregar esto
+
+  const handleClick = e => {
+    if (disabled) return
+    onClick?.(e)
+    if (closeOnClick) {
+      close() // ← cerrar el dropdown al hacer clic
+    }
+  }
+
   const baseClasses = classNames(
     'inline-flex items-center w-full p-2 rounded transition',
     className
@@ -210,8 +221,7 @@ export const DropdownItem = ({
     danger: classNames(
       'cursor-pointer',
       'text-red-600 dark:text-red-400',
-      'hover:bg-red-300/20 dark:hover:bg-red-900/30',
-      'disabled:opacity-50 disabled:cursor-not-allowed'
+      'hover:bg-red-300/20 dark:hover:bg-red-900/30'
     ),
     disabled: classNames(
       'text-neutral-400 dark:text-neutral-600',
@@ -230,7 +240,7 @@ export const DropdownItem = ({
   return (
     <li>
       <Component
-        onClick={disabled ? undefined : onClick}
+        onClick={handleClick}
         disabled={disabled}
         className={classes}
         {...props}

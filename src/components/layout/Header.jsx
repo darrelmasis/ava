@@ -88,9 +88,9 @@ export default function Header() {
                 </div>
                 <div className="truncate text-neutral-400 dark:text-neutral-400 flex gap-5">
                   <span>{user?.email}</span>
-                  <span className="px-[4px] py-[1px] text-xs rounded-full bg-lime-100 dark:bg-lime-800/40 text-lime-700 dark:text-lime-300 font-medium capitalize border border-lime-200 dark:border-lime-700">
+                  <Badge size="sm" variant="lime">
                     {user?.role}
-                  </span>
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -107,10 +107,12 @@ export default function Header() {
               <DropdownItem
                 as="a"
                 onClick={() => navigate(`/chat`)}
-                className='justify-between'
+                className="justify-between"
               >
                 <span>Chat</span>
-                <Badge size='sm' variant='success'>Beta</Badge>
+                <Badge size="sm" variant="success">
+                  Beta
+                </Badge>
               </DropdownItem>
 
               <DropdownItem variant="disabled" as="span">
@@ -120,6 +122,7 @@ export default function Header() {
               <DropdownItem
                 onClick={() => toggleTheme(!isDark)}
                 className="flex items-center justify-between select-none"
+                closeOnClick={false}
               >
                 <span className="text-sm text-neutral-900 dark:text-white">
                   Modo oscuro
@@ -138,6 +141,7 @@ export default function Header() {
                 variant="danger"
                 onClick={handleLogout}
                 disabled={loggingOut}
+                closeOnClick={false}
               >
                 {loggingOut ? (
                   <span className="flex items-center gap-2">

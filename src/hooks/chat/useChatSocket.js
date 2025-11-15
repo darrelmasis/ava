@@ -9,6 +9,7 @@ export function useChatSocket() {
   const [isConnected, setIsConnected] = useState(false)
   const [connectionError, setConnectionError] = useState(null)
   const [connectedUsers, setConnectedUsers] = useState([])
+  const [typingUsers, setTypingUsers] = useState(new Map()) // Map<userId, {userName, fullName}>
   const socketRef = useRef(null)
   const isConnectingRef = useRef(false)
 
@@ -35,7 +36,6 @@ export function useChatSocket() {
       import.meta.env.VITE_CHAT_SERVER_URL ||
       'https://violent-wini-dm-org-63795708.koyeb.app'
 
-    // console.log('🔌 Conectando a:', CHAT_SERVER_URL)
     setConnectionError(null)
     isConnectingRef.current = true
 
@@ -48,7 +48,6 @@ export function useChatSocket() {
     })
 
     const handleConnect = () => {
-      // console.log('✅ Conectado al chat')
       setIsConnected(true)
       setConnectionError(null)
       isConnectingRef.current = false
@@ -61,13 +60,11 @@ export function useChatSocket() {
     }
 
     const handleDisconnect = () => {
-      // console.log('🔌 Desconectado del chat')
       setIsConnected(false)
       isConnectingRef.current = false
     }
 
     const handleConnectError = error => {
-      // console.error('❌ Error de conexión:', error)
       setIsConnected(false)
       isConnectingRef.current = false
       setConnectionError(
@@ -76,7 +73,6 @@ export function useChatSocket() {
     }
 
     const handleUsersList = usersList => {
-      // console.log('📋 Usuarios conectados recibidos:', usersList)
       setConnectedUsers(usersList || [])
     }
 
@@ -85,7 +81,6 @@ export function useChatSocket() {
     }
 
     const handleMessageNew = message => {
-      // console.log('📨 Nuevo mensaje recibido:', message)
       setMessages(prev => [...prev, message])
 
       if (String(message.userId) !== String(user?._id || user?.id)) {
@@ -98,7 +93,7 @@ export function useChatSocket() {
 
     const handleUserJoined = data => {
       if (data.userName !== user?.userName) {
-        toast.success(`🟢 ${data.userName} se ha conectado`, {
+        toast.success(`${data.userName} se ha conectado`, {
           position: 'top-right',
           duration: 3000,
           icon: '👋',
@@ -108,12 +103,35 @@ export function useChatSocket() {
 
     const handleUserLeft = data => {
       if (data.userName !== user?.userName) {
-        toast(`🔴 ${data.userName} se ha desconectado`, {
+        toast.error(`${data.userName} se ha desconectado`, {
           position: 'top-right',
           duration: 2000,
           icon: '👋',
         })
       }
+    }
+
+    const handleTypingStatus = data => {
+      setTypingUsers(prev => {
+        // Crear un nuevo Map completamente nuevo para que React detecte el cambio
+        const newMap = new Map()
+        // Copiar todos los valores anteriores
+        if (prev && prev.size > 0) {
+          prev.forEach((value, key) => {
+            newMap.set(key, value)
+          })
+        }
+        
+        if (data.isTyping) {
+          newMap.set(String(data.userId), {
+            userName: data.userName,
+            fullName: data.fullName || data.userName,
+          })
+        } else {
+          newMap.delete(String(data.userId))
+        }
+        return newMap
+      })
     }
 
     // Registrar todos los listeners
@@ -125,6 +143,7 @@ export function useChatSocket() {
     socket.on('message:new', handleMessageNew)
     socket.on('user:joined', handleUserJoined)
     socket.on('user:left', handleUserLeft)
+    socket.on('typing:status', handleTypingStatus)
 
     socketRef.current = socket
 
@@ -152,6 +171,14 @@ export function useChatSocket() {
     }
 
     socketRef.current.emit('message:send', message)
+    // Dejar de escribir cuando se envía el mensaje
+    socketRef.current.emit('typing:stop')
+    return true
+  }
+
+  const sendTyping = (isTyping) => {
+    if (!isConnected || !socketRef.current) return false
+    socketRef.current.emit(isTyping ? 'typing:start' : 'typing:stop')
     return true
   }
 
@@ -161,7 +188,9 @@ export function useChatSocket() {
     isConnected,
     connectionError,
     connectedUsers,
+    typingUsers,
     sendMessage,
+    sendTyping,
   }
 }
 

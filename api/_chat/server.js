@@ -110,6 +110,30 @@ io.on('connection', socket => {
     console.log(`💬 ${message.user}: ${message.text}`)
   })
 
+  // Cuando un usuario empieza a escribir
+  socket.on('typing:start', () => {
+    if (socket.userData) {
+      socket.broadcast.emit('typing:status', {
+        userId: socket.userData.id,
+        userName: socket.userData.userName,
+        fullName: socket.userData.fullName,
+        isTyping: true,
+      })
+    }
+  })
+
+  // Cuando un usuario deja de escribir
+  socket.on('typing:stop', () => {
+    if (socket.userData) {
+      socket.broadcast.emit('typing:status', {
+        userId: socket.userData.id,
+        userName: socket.userData.userName,
+        fullName: socket.userData.fullName,
+        isTyping: false,
+      })
+    }
+  })
+
   // Cuando un usuario se desconecta
   socket.on('disconnect', () => {
     console.log('❌ Cliente desconectado:', socket.id)
