@@ -112,6 +112,14 @@ export function useChatSocket() {
     }
 
     const handleTypingStatus = data => {
+      // Ignorar eventos de typing del mismo usuario (desde otros dispositivos)
+      const currentUserId = String(user?._id || user?.id || '')
+      const eventUserId = String(data.userId || '')
+      
+      if (currentUserId && eventUserId && currentUserId === eventUserId) {
+        return // No hacer nada si es el mismo usuario
+      }
+
       setTypingUsers(prev => {
         // Crear un nuevo Map completamente nuevo para que React detecte el cambio
         const newMap = new Map()
