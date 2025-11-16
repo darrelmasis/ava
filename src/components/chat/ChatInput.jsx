@@ -38,7 +38,6 @@ export default function ChatInput({
 
     if (isTypingRef.current) {
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
-
       typingTimeoutRef.current = setTimeout(() => {
         const diff = Date.now() - lastTypingTimeRef.current
         if (isTypingRef.current && diff >= 800) {
@@ -46,17 +45,14 @@ export default function ChatInput({
           sendTyping(false)
         }
       }, 800)
-
       return
     }
 
     if (!typingStartTimeoutRef.current && !typingStartRafRef.current) {
       typingStartRafRef.current = requestAnimationFrame(() => {
         typingStartRafRef.current = null
-
         typingStartTimeoutRef.current = setTimeout(() => {
           typingStartTimeoutRef.current = null
-
           if (!isTypingRef.current) {
             isTypingRef.current = true
             sendTyping(true)
@@ -85,7 +81,6 @@ export default function ChatInput({
         clearTimeout(typingStartTimeoutRef.current)
       if (typingStartRafRef.current)
         cancelAnimationFrame(typingStartRafRef.current)
-
       if (isTypingRef.current && sendTyping) sendTyping(false)
     }
   }, [])
@@ -95,10 +90,8 @@ export default function ChatInput({
     if (typingStartTimeoutRef.current)
       clearTimeout(typingStartTimeoutRef.current)
     if (typingStartRafRef.current)
-      cancelAnimationFrame(typingStartRafRefRef.current)
-
+      cancelAnimationFrame(typingStartRafRef.current)
     typingStartRafRef.current = null
-
     if (isTypingRef.current && sendTyping) {
       isTypingRef.current = false
       sendTyping(false)
@@ -110,13 +103,10 @@ export default function ChatInput({
   // ---------------------------
   const handleSubmit = e => {
     e.preventDefault()
-
     clearTypingStates()
-
     if (newMessage.trim()) {
       onSendMessage(e)
     }
-
     if (inputRef.current) {
       inputRef.current.style.height = 'auto'
       inputRef.current.focus()
@@ -134,13 +124,10 @@ export default function ChatInput({
   const handleEmojiClick = emojiData => {
     const emoji = emojiData.emoji
     const cursor = inputRef.current?.selectionStart || newMessage.length
-
     const updated =
       newMessage.slice(0, cursor) + emoji + newMessage.slice(cursor)
-
     setNewMessage(updated)
     handleTyping()
-
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus()
@@ -153,81 +140,86 @@ export default function ChatInput({
   }
 
   // ---------------------------
-  //   ENVIAR 👍 SIN ANIMACIONES
+  //   ENVIAR 👍 DIRECTAMENTE
   // ---------------------------
   const handleSendThumbsUp = () => {
     if (!isConnected || !sendMessage || !user) return
-
     clearTypingStates()
-
     const userId = user._id || user.id
     const userName = user.fullName || 'Usuario'
-
     sendMessage('👍', userName, userId)
   }
 
+  // ---------------------------
+  //   RENDER
+  // ---------------------------
   return (
-    <form onSubmit={handleSubmit} className="sticky bottom-4 px-4">
-      <div className="relative flex items-center rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 focus-within:ring-2 focus-within:ring-lime-500 focus-within:border-lime-500 transition-all duration-200 px-2 gap-2">
-        <EmojiTriggerButton
-          disabled={!isConnected}
-          onEmojiClick={handleEmojiClick}
-        />
+    <form
+      onSubmit={handleSubmit}
+      className="sticky bottom-0 px-4 py-2 w-full bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800"
+    >
+      <div className="flex justify-center">
+        <div className="relative flex items-center rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 focus-within:ring-2 focus-within:ring-lime-500 focus-within:border-lime-500 transition-all duration-200 px-2 gap-2 w-full max-w-4xl">
+          <EmojiTriggerButton
+            disabled={!isConnected}
+            onEmojiClick={handleEmojiClick}
+          />
 
-        <textarea
-          ref={inputRef}
-          value={newMessage}
-          onChange={e => {
-            setNewMessage(e.target.value)
-            handleTyping()
-          }}
-          onInput={handleInput}
-          placeholder="Escribe un mensaje..."
-          disabled={!isConnected}
-          rows={1}
-          className="flex-1 px-2 py-3 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-neutral-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed resize-none min-h-[48px] max-h-[120px]"
-          onKeyDown={e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              handleSubmit(e)
-            } else {
+          <textarea
+            ref={inputRef}
+            value={newMessage}
+            onChange={e => {
+              setNewMessage(e.target.value)
               handleTyping()
-            }
-          }}
-        />
+            }}
+            onInput={handleInput}
+            placeholder="Escribe un mensaje..."
+            disabled={!isConnected}
+            rows={1}
+            className="flex-1 px-2 py-2.5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-neutral-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed resize-none min-h-[40px] max-h-[120px] overflow-hidden bg-transparent"
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSubmit(e)
+              } else {
+                handleTyping()
+              }
+            }}
+          />
 
-        {newMessage.trim() ? (
-          <button
-            type="submit"
-            disabled={!isConnected}
-            className="p-2 rounded-lg bg-lime-500 hover:bg-lime-600 dark:bg-lime-600 dark:hover:bg-lime-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {newMessage.trim() ? (
+            <button
+              type="submit"
+              disabled={!isConnected}
+              className="p-2 rounded-lg bg-lime-500 hover:bg-lime-600 dark:bg-lime-600 dark:hover:bg-lime-700 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
-          </button>
-        ) : (
-          <button
-            key="thumbup"
-            type="button"
-            onClick={handleSendThumbsUp}
-            disabled={!isConnected}
-            className="w-9 h-9 rounded-full text-xl flex items-center justify-center hover:bg-neutral-300 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Enviar pulgar arriba"
-          >
-            👍
-          </button>
-        )}
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            </button>
+          ) : (
+            <button
+              key="thumbup"
+              type="button"
+              onClick={handleSendThumbsUp}
+              disabled={!isConnected}
+              className="w-9 h-9 rounded-full text-xl flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Enviar pulgar arriba"
+            >
+              👍
+            </button>
+          )}
+        </div>
       </div>
     </form>
   )

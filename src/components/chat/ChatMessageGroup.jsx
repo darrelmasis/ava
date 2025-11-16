@@ -17,7 +17,7 @@ export default function ChatMessageGroup({
       String(prevUserGroup.userId) !== String(userGroup.userId))
 
   return (
-    <div key={`${userGroup.userId}-${groupIndex}`} className="mb-2">
+    <div key={`${userGroup.userId}-${groupIndex}`} className="mb-1">
       {userGroup.messages.map((msg, msgIndex) => {
         const isFirstInGroup = msgIndex === 0
         const isLastInGroup = msgIndex === userGroup.messages.length - 1

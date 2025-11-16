@@ -64,7 +64,7 @@ export function useChatSocket() {
       isConnectingRef.current = false
     }
 
-    const handleConnectError = error => {
+    const handleConnectError = () => {
       setIsConnected(false)
       isConnectingRef.current = false
       setConnectionError(

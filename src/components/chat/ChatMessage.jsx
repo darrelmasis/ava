@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Avatar from '../commons/Avatar'
 
 // Regex mejorado para detectar emojis (más completo y eficiente)
 // Detecta: emojis Unicode, variantes, secuencias, banderas, etc.
-const EMOJI_REGEX = /([\uD83C-\uDBFF\uDC00-\uDFFF]+|[\u2600-\u27BF])/g;
+const EMOJI_REGEX = /([\uD83C-\uDBFF\uDC00-\uDFFF]+|[\u2600-\u27BF])/gu;
 
 // Función optimizada para detectar y renderizar emojis más grandes
 const renderTextWithEmojis = (text, messageId) => {
@@ -74,8 +74,18 @@ export default function ChatMessage({
     minute: '2-digit',
   })
   
+  const fullDateTime = new Date(message.timestamp).toLocaleString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 
-  // Memoizar el renderizado de emojis para mejorar el rendimiento
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Memoizar el renderizado de emojis
   const renderedText = useMemo(
     () => renderTextWithEmojis(message.text, message.id || message.timestamp),
     [message.text, message.id, message.timestamp]
@@ -83,42 +93,63 @@ export default function ChatMessage({
 
   // Mensaje de otro usuario
   if (!isOwn) {
+    // Determinar clases de bordes redondeados
+    let roundedClasses = 'rounded-2xl'
+    if (isFirstInGroup && isLastInGroup) {
+      // Único mensaje: solo la esquina superior izquierda menos redondeada
+      roundedClasses = 'rounded-tl-sm rounded-tr-2xl rounded-br-2xl rounded-bl-2xl'
+    } else if (isFirstInGroup) {
+      // Primer mensaje: esquina superior izquierda menos redondeada
+      roundedClasses = 'rounded-tl-sm rounded-tr-2xl rounded-br-2xl rounded-bl-2xl'
+    } else if (isLastInGroup) {
+      // Último mensaje: esquina inferior izquierda menos redondeada
+      roundedClasses = 'rounded-tl-2xl rounded-tr-2xl rounded-br-2xl rounded-bl-sm'
+    }
+
     return (
-      <div className="flex items-end gap-2 mb-1 justify-start">
+      <div className="flex items-start gap-2 mb-1 justify-start">
         {/* Avatar izquierdo */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 w-8 h-8 flex items-start">
           {isFirstInGroup && showAvatar ? (
             <Avatar name={message.user} size="sm" />
-          ) : (
-            <div className="w-8"></div>
-          )}
+          ) : null}
         </div>
 
         {/* Contenedor del mensaje */}
-        <div className="flex flex-col max-w-[70%] items-start">
+        <div className="flex flex-col max-w-[70%] items-start group">
           {/* Nombre del usuario */}
           {isFirstInGroup && showAvatar && (
-            <div className="mb-1">
+            <div className="mb-0.5">
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                 {message.user}
               </span>
             </div>
           )}
 
-          {/* Burbuja del mensaje */}
-          <div
-            className={`px-4 py-2.5 rounded-2xl bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border border-neutral-200 dark:border-neutral-700 shadow-sm ${
-              isFirstInGroup ? 'rounded-tl-sm' : 'rounded-tl-2xl'
-            } ${isLastInGroup ? 'rounded-bl-sm' : 'rounded-bl-2xl'}`}
-          >
-            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-              {renderedText}
-            </p>
+          {/* Contenedor de mensaje y hora */}
+          <div className="relative">
+            {/* Burbuja del mensaje */}
+            <div
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className={`px-2.5 py-1.5 ${roundedClasses} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border border-neutral-200 dark:border-neutral-700`}
+            >
+              <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                {renderedText}
+              </p>
+            </div>
+            
+            {/* Hora visible al hacer hover */}
+            {isHovered && (
+              <span className="absolute left-full top-1/2 -translate-y-1/2 ml-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap bg-white dark:bg-neutral-900 px-2 py-1 rounded shadow-lg border border-neutral-200 dark:border-neutral-700 z-10">
+                {fullDateTime}
+              </span>
+            )}
           </div>
 
           {/* Timestamp */}
           {isLastInGroup && (
-            <div className="mt-1 px-2">
+            <div className="mt-0.5 px-2">
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {time}
               </span>
@@ -130,24 +161,47 @@ export default function ChatMessage({
   }
 
   // Mensaje propio
+  // Determinar clases de bordes redondeados
+  let roundedClasses = 'rounded-2xl'
+  if (isFirstInGroup && isLastInGroup) {
+    // Único mensaje: solo la esquina superior derecha menos redondeada
+    roundedClasses = 'rounded-tr-sm rounded-tl-2xl rounded-bl-2xl rounded-br-2xl'
+  } else if (isFirstInGroup) {
+    // Primer mensaje: esquina superior derecha menos redondeada
+    roundedClasses = 'rounded-tr-sm rounded-tl-2xl rounded-bl-2xl rounded-br-2xl'
+  } else if (isLastInGroup) {
+    // Último mensaje: esquina inferior derecha menos redondeada
+    roundedClasses = 'rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl rounded-br-sm'
+  }
+
   return (
-    <div className="flex items-end gap-2 mb-1 justify-end">
+    <div className="flex items-start gap-2 mb-1 justify-end">
       {/* Contenedor del mensaje */}
-      <div className="flex flex-col max-w-[70%] items-end">
-        {/* Burbuja del mensaje */}
-        <div
-          className={`px-4 py-2.5 rounded-2xl bg-lime-500/50 text-lime-900 dark:text-white shadow-sm ${
-            isFirstInGroup ? 'rounded-tr-sm' : 'rounded-tr-2xl'
-          } ${isLastInGroup ? 'rounded-br-sm' : 'rounded-br-2xl'}`}
-        >
-          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-            {renderedText}
-          </p>
+      <div className="flex flex-col max-w-[70%] items-end group">
+        {/* Contenedor de mensaje y hora */}
+        <div className="relative">
+          {/* Burbuja del mensaje */}
+          <div
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className={`px-2.5 py-1.5 ${roundedClasses} bg-lime-500 dark:bg-lime-600 text-white`}
+          >
+            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+              {renderedText}
+            </p>
+          </div>
+          
+          {/* Hora visible al hacer hover */}
+          {isHovered && (
+            <span className="absolute right-full top-1/2 -translate-y-1/2 mr-2 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap bg-white dark:bg-neutral-900 px-2 py-1 rounded shadow-lg border border-neutral-200 dark:border-neutral-700 z-10">
+              {fullDateTime}
+            </span>
+          )}
         </div>
 
         {/* Timestamp */}
         {isLastInGroup && (
-          <div className="mt-1 px-2">
+          <div className="mt-0.5 px-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {time}
             </span>
@@ -156,12 +210,10 @@ export default function ChatMessage({
       </div>
 
       {/* Avatar derecho */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 w-8 h-8 flex items-start">
         {isFirstInGroup ? (
           <Avatar name={user?.fullName || user?.userName || 'Tú'} size="sm" />
-        ) : (
-          <div className="w-8"></div>
-        )}
+        ) : null}
       </div>
     </div>
   )

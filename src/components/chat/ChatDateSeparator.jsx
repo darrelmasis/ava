@@ -21,12 +21,12 @@ export default function ChatDateSeparator({ date }) {
   }
 
   return (
-    <div className="flex items-center my-4">
-      <div className="flex-1 border-t border-neutral-300 dark:border-neutral-700"></div>
-      <span className="px-3 text-xs font-medium text-gray-500 dark:text-gray-400">
+    <div className="flex items-center my-6">
+      <div className="flex-1 border-t border-neutral-200/60 dark:border-neutral-700/60"></div>
+      <span className="px-4 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-neutral-800 rounded-full border border-neutral-200 dark:border-neutral-700">
         {formatDate(date)}
       </span>
-      <div className="flex-1 border-t border-neutral-300 dark:border-neutral-700"></div>
+      <div className="flex-1 border-t border-neutral-200/60 dark:border-neutral-700/60"></div>
     </div>
   )
 }

@@ -23,9 +23,9 @@ export default function TypingIndicator({ typingUsers, currentUserId }) {
   }
 
   return (
-    <p className=" right-0 left-0 bottom-4 text-sm text-gray-500 dark:text-gray-400">
+    <div className="right-0 left-0 bottom-4 text-sm text-gray-500 dark:text-gray-400">
       <div className="flex items-center gap-1.5">
-        <span className="text-neutral-700 dark:text-neutral-300 text-xs">
+        <span className="text-neutral-700 dark:text-lime-100 text-xs">
           {otherTypingUsers.map((typingUser, index) => (
             <span key={typingUser.userName || index}>
               {typingUser.fullName.split(' ')[0]}
@@ -37,6 +37,6 @@ export default function TypingIndicator({ typingUsers, currentUserId }) {
             : ' están escribiendo...'}
         </span>
       </div>
-    </p>
+    </div>
   )
 }

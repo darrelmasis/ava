@@ -1,9 +1,9 @@
 export default function ChatEmpty() {
   return (
-    <div className="flex flex-col items-center justify-center text-center">
-      <div className="w-16 h-16 rounded-full bg-lime-100 dark:bg-lime-900/30 flex items-center justify-center mb-4">
+    <div className="flex flex-col items-center justify-center text-center px-4">
+      <div className="w-20 h-20 rounded-2xl bg-lime-100 dark:bg-lime-900/40 flex items-center justify-center mb-5">
         <svg
-          className="w-8 h-8 text-lime-600 dark:text-lime-400"
+          className="w-10 h-10 text-lime-600 dark:text-lime-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -16,11 +16,11 @@ export default function ChatEmpty() {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
         No hay mensajes aún
       </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Sé el primero en escribir
+      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+        Sé el primero en escribir un mensaje en el chat
       </p>
     </div>
   )

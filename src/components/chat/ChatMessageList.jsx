@@ -11,16 +11,16 @@ export default function ChatMessageList({
   const hasMessages = groupedMessages.length > 0
 
   return (
-    <div className="chat-messages-container overflow-y-auto px-4 h-[calc(100vh-231px)] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+    <div className="chat-messages-container overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex justify-center px-4 py-6">
       {!hasMessages ? (
         <div className="flex flex-col items-center justify-center text-center h-full min-h-full">
           <ChatEmpty />
           <div ref={messagesEndRef} aria-hidden="true" style={{ height: 0 }} />
         </div>
       ) : (
-        <>
+        <div className="w-full max-w-4xl space-y-4">
           {groupedMessages.map(group => (
-            <div key={group.date}>
+            <div key={group.date} className="space-y-3">
               <ChatDateSeparator date={group.date} />
 
               {group.userGroups.map((userGroup, groupIndex) => {
@@ -43,7 +43,7 @@ export default function ChatMessageList({
             </div>
           ))}
           <div ref={messagesEndRef} aria-hidden="true" style={{ height: 0 }} />
-        </>
+        </div>
       )}
     </div>
   )

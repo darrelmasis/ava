@@ -31,15 +31,15 @@ export default function EmojiTriggerButton({
   useEffect(() => {
     if (!open) return
 
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       const target = event.target
-      
+
       // Verificar si el click fue fuera de ambos elementos
-      const isOutsidePicker = pickerRef.current && 
-        !pickerRef.current.contains(target)
-      const isOutsideTrigger = triggerRef.current && 
-        !triggerRef.current.contains(target)
-      
+      const isOutsidePicker =
+        pickerRef.current && !pickerRef.current.contains(target)
+      const isOutsideTrigger =
+        triggerRef.current && !triggerRef.current.contains(target)
+
       if (isOutsidePicker && isOutsideTrigger) {
         setOpen(false)
       }
@@ -47,35 +47,41 @@ export default function EmojiTriggerButton({
 
     // Usar capture phase para mejor detección
     document.addEventListener('mousedown', handleClickOutside, true)
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside, true)
     }
   }, [open, setOpen])
 
   // Manejo seguro de emoji click (no cerrar el panel para permitir múltiples selecciones)
-  const handleEmojiClick = useCallback((emojiData) => {
-    if (emojiData?.emoji) {
-      onEmojiClick?.(emojiData)
-      // No cerrar el panel para permitir seleccionar múltiples emojis
-    }
-  }, [onEmojiClick])
+  const handleEmojiClick = useCallback(
+    emojiData => {
+      if (emojiData?.emoji) {
+        onEmojiClick?.(emojiData)
+        // No cerrar el panel para permitir seleccionar múltiples emojis
+      }
+    },
+    [onEmojiClick]
+  )
 
   // Configuración del picker memoizada
-  const emojiPickerConfig = useMemo(() => ({
-    onEmojiClick: handleEmojiClick,
-    theme: isDark ? 'dark' : 'light',
-    lazyLoadEmojis: true,
-    skinTonesDisabled: true,
-    previewConfig: { showPreview: false },
-    emojiStyle: "native",
-    width: 320,
-    height: 400,
-    ...pickerProps,
-  }), [isDark, handleEmojiClick, pickerProps])
+  const emojiPickerConfig = useMemo(
+    () => ({
+      onEmojiClick: handleEmojiClick,
+      theme: isDark ? 'dark' : 'light',
+      lazyLoadEmojis: true,
+      skinTonesDisabled: true,
+      previewConfig: { showPreview: false },
+      emojiStyle: 'apple',
+      width: 320,
+      height: 400,
+      ...pickerProps,
+    }),
+    [isDark, handleEmojiClick, pickerProps]
+  )
 
   return (
-    <div className="relative" {...rest}>
+    <div className="relative z-99" {...rest}>
       {/* Trigger */}
       <button
         type="button"
@@ -110,10 +116,16 @@ export default function EmojiTriggerButton({
       {open && (
         <div
           ref={pickerRef}
-          className={`absolute ${
+          className={`absolute z-40 ${
             placement === 'top'
               ? 'bottom-full mb-2 left-0'
-              : 'top-full mt-2 left-0'
+              : placement === 'bottom'
+                ? 'top-full mt-2 left-0'
+                : placement === 'right'
+                  ? 'right-full mr-2 top-0'
+                  : placement === 'left'
+                    ? 'left-full ml-2 top-0'
+                    : 'top-full mt-2 left-0'
           } z-50 shadow-lg rounded-lg overflow-hidden`}
         >
           <EmojiPicker {...emojiPickerConfig} />

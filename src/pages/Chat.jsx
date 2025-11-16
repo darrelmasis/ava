@@ -1,16 +1,18 @@
-import { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import ChatHeader from '../components/chat/ChatHeader'
 import ChatError from '../components/chat/ChatError'
 import ChatMessageList from '../components/chat/ChatMessageList'
 import ChatInput from '../components/chat/ChatInput'
-import TypingIndicator from '../components/chat/TypingIndicator'
+import ScrollToBottomButton from '../components/chat/ScrollToBottomButton'
 import { useChatSocket } from '../hooks/chat/useChatSocket'
 import { useGroupedMessages } from '../hooks/chat/useGroupedMessages'
+import { useTheme } from '../hooks/useTheme'
 
 export default function Chat() {
   const { user } = useAuth()
+  const { isDark } = useTheme()
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
@@ -40,7 +42,7 @@ export default function Chat() {
           ) {
             try {
               messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-            } catch (error) {
+            } catch {
               // Ignorar errores silenciosamente
             }
           }
@@ -68,7 +70,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex flex-col bg-neutral-100 dark:bg-neutral-900 max-w-3xl mx-auto h-[calc(100vh-71px)]">
+    <div className="relative flex flex-col bg-neutral-100 dark:bg-neutral-900 w-full mx-auto h-[calc(100vh-71px)]">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -102,6 +104,9 @@ export default function Chat() {
         ref={messagesContainerRef}
         key="chat-messages-main"
         className="relative flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        style={{
+          backgroundColor: isDark ? '#0b0b0b' : '#efeae2',
+        }}
       >
         <ChatMessageList
           key={`chat-messages-${groupedMessages.length}`}
@@ -110,8 +115,11 @@ export default function Chat() {
           user={user}
           messagesEndRef={messagesEndRef}
         />
+        <ScrollToBottomButton
+          containerRef={messagesContainerRef}
+          messagesEndRef={messagesEndRef}
+        />
       </main>
-
 
       <ChatInput
         newMessage={newMessage}
