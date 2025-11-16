@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react'
+import { useState, useRef, useLayoutEffect, useMemo } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Toaster } from 'react-hot-toast'
 import ChatHeader from '../components/chat/ChatHeader'
@@ -9,6 +9,7 @@ import ScrollToBottomButton from '../components/chat/ScrollToBottomButton'
 import { useChatSocket } from '../hooks/chat/useChatSocket'
 import { useGroupedMessages } from '../hooks/chat/useGroupedMessages'
 import { useTheme } from '../hooks/useTheme'
+import { MAX_MESSAGES_DISPLAY } from '../config/chatConfig'
 
 export default function Chat() {
   const { user } = useAuth()
@@ -27,7 +28,16 @@ export default function Chat() {
     sendTyping,
   } = useChatSocket()
 
-  const groupedMessages = useGroupedMessages(messages)
+  // Limitar mensajes mostrados: mantener solo los últimos MAX_MESSAGES_DISPLAY
+  const limitedMessages = useMemo(() => {
+    if (messages.length <= MAX_MESSAGES_DISPLAY) {
+      return messages
+    }
+    // Mantener solo los últimos N mensajes (eliminar los más antiguos)
+    return messages.slice(-MAX_MESSAGES_DISPLAY)
+  }, [messages])
+
+  const groupedMessages = useGroupedMessages(limitedMessages)
 
   // Usar useLayoutEffect para scroll más seguro
   useLayoutEffect(() => {
