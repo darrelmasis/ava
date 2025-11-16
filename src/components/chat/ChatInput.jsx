@@ -7,6 +7,8 @@ export default function ChatInput({
   onSendMessage,
   isConnected,
   sendTyping,
+  sendMessage,
+  user,
 }) {
   const inputRef = useRef(null)
   const typingTimeoutRef = useRef(null)
@@ -15,7 +17,9 @@ export default function ChatInput({
   const isTypingRef = useRef(false)
   const lastTypingTimeRef = useRef(0)
 
-  // Auto-resize textarea
+  // ---------------------------
+  //   AUTO-RESIZE DEL TEXTAREA
+  // ---------------------------
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.height = 'auto'
@@ -23,53 +27,44 @@ export default function ChatInput({
     }
   }, [newMessage])
 
-  // Función para manejar el evento de typing
+  // ---------------------------
+  //   MANEJO DE TYPING
+  // ---------------------------
   const handleTyping = useCallback(() => {
     if (!isConnected || !sendTyping) return
 
     const now = Date.now()
     lastTypingTimeRef.current = now
 
-    // Si ya está marcado como escribiendo, solo resetear el timeout de stop
     if (isTypingRef.current) {
-      // Limpiar timeout anterior de stop
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-      // Resetear el timeout de stop (1 segundo después de la última tecla)
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+
       typingTimeoutRef.current = setTimeout(() => {
-        const timeSinceLastTyping = Date.now() - lastTypingTimeRef.current
-        if (isTypingRef.current && timeSinceLastTyping >= 1000) {
+        const diff = Date.now() - lastTypingTimeRef.current
+        if (isTypingRef.current && diff >= 800) {
           isTypingRef.current = false
           sendTyping(false)
         }
-      }, 1000)
+      }, 800)
+
       return
     }
 
-    // Si no está escribiendo, emitir typing:start después de un pequeño delay
     if (!typingStartTimeoutRef.current && !typingStartRafRef.current) {
-      // Marcar que el RAF está configurado para evitar múltiples configuraciones
       typingStartRafRef.current = requestAnimationFrame(() => {
         typingStartRafRef.current = null
 
-        // Guardar el ID del timeout
         typingStartTimeoutRef.current = setTimeout(() => {
-          // Limpiar la referencia
           typingStartTimeoutRef.current = null
 
-          // Verificar que aún no esté escribiendo
           if (!isTypingRef.current) {
             isTypingRef.current = true
             sendTyping(true)
 
-            // Configurar timeout de stop
-            if (typingTimeoutRef.current) {
-              clearTimeout(typingTimeoutRef.current)
-            }
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
             typingTimeoutRef.current = setTimeout(() => {
-              const timeSinceLastTyping = Date.now() - lastTypingTimeRef.current
-              if (isTypingRef.current && timeSinceLastTyping >= 1000) {
+              const diff = Date.now() - lastTypingTimeRef.current
+              if (isTypingRef.current && diff >= 1000) {
                 isTypingRef.current = false
                 sendTyping(false)
               }
@@ -80,88 +75,105 @@ export default function ChatInput({
     }
   }, [isConnected, sendTyping])
 
-  // Limpiar timeouts solo al desmontar
+  // ---------------------------
+  //   LIMPIAR TYPING AL DESMONTAR
+  // ---------------------------
   useEffect(() => {
     return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current)
-      }
-      if (typingStartTimeoutRef.current) {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+      if (typingStartTimeoutRef.current)
         clearTimeout(typingStartTimeoutRef.current)
-      }
-      if (typingStartRafRef.current) {
+      if (typingStartRafRef.current)
         cancelAnimationFrame(typingStartRafRef.current)
-      }
-      if (isTypingRef.current && sendTyping) {
-        sendTyping(false)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Solo se ejecuta al desmontar
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    // Limpiar todos los timeouts de typing
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current)
+      if (isTypingRef.current && sendTyping) sendTyping(false)
     }
-    if (typingStartTimeoutRef.current) {
+  }, [])
+
+  const clearTypingStates = () => {
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+    if (typingStartTimeoutRef.current)
       clearTimeout(typingStartTimeoutRef.current)
-    }
-    if (typingStartRafRef.current) {
-      cancelAnimationFrame(typingStartRafRef.current)
-      typingStartRafRef.current = null
-    }
+    if (typingStartRafRef.current)
+      cancelAnimationFrame(typingStartRafRefRef.current)
+
+    typingStartRafRef.current = null
+
     if (isTypingRef.current && sendTyping) {
       isTypingRef.current = false
       sendTyping(false)
     }
-    onSendMessage(e)
-    // Resetear altura después de enviar
+  }
+
+  // ---------------------------
+  //   SUBMIT NORMAL (Enter)
+  // ---------------------------
+  const handleSubmit = e => {
+    e.preventDefault()
+
+    clearTypingStates()
+
+    if (newMessage.trim()) {
+      onSendMessage(e)
+    }
+
     if (inputRef.current) {
       inputRef.current.style.height = 'auto'
+      inputRef.current.focus()
     }
-    inputRef.current?.focus()
   }
 
   const handleInput = e => {
-    // Auto-resize mientras escribe
     e.target.style.height = 'auto'
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px` // Máximo 120px
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
   }
 
+  // ---------------------------
+  //   INSERTAR EMOJI
+  // ---------------------------
   const handleEmojiClick = emojiData => {
     const emoji = emojiData.emoji
-    const cursorPosition = inputRef.current.selectionStart
-    const textBeforeCursor = newMessage.slice(0, cursorPosition)
-    const textAfterCursor = newMessage.slice(cursorPosition)
-    const updatedMessage = textBeforeCursor + emoji + textAfterCursor
-    setNewMessage(updatedMessage)
-    // Emitir evento de typing cuando se inserta un emoji
+    const cursor = inputRef.current?.selectionStart || newMessage.length
+
+    const updated =
+      newMessage.slice(0, cursor) + emoji + newMessage.slice(cursor)
+
+    setNewMessage(updated)
     handleTyping()
-    // Restaurar posición del cursor después del emoji
+
     setTimeout(() => {
       if (inputRef.current) {
+        inputRef.current.focus()
         inputRef.current.setSelectionRange(
-          cursorPosition + emoji.length,
-          cursorPosition + emoji.length
+          cursor + emoji.length,
+          cursor + emoji.length
         )
       }
     }, 0)
   }
 
+  // ---------------------------
+  //   ENVIAR 👍 SIN ANIMACIONES
+  // ---------------------------
+  const handleSendThumbsUp = () => {
+    if (!isConnected || !sendMessage || !user) return
+
+    clearTypingStates()
+
+    const userId = user._id || user.id
+    const userName = user.fullName || 'Usuario'
+
+    sendMessage('👍', userName, userId)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="sticky bottom-4 px-4">
       <div className="relative flex items-center rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 focus-within:ring-2 focus-within:ring-lime-500 focus-within:border-lime-500 transition-all duration-200 px-2 gap-2">
-        {/* Botón de emoji - dentro del input a la izquierda */}
-        <div className="flex-shrink-0">
-          <EmojiTriggerButton
-            disabled={!isConnected}
-            onEmojiClick={handleEmojiClick}
-          />
-        </div>
+        <EmojiTriggerButton
+          disabled={!isConnected}
+          onEmojiClick={handleEmojiClick}
+        />
 
-        {/* Textarea */}
         <textarea
           ref={inputRef}
           value={newMessage}
@@ -173,7 +185,7 @@ export default function ChatInput({
           placeholder="Escribe un mensaje..."
           disabled={!isConnected}
           rows={1}
-          className="flex-1 px-2 py-3 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-neutral-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed resize-none overflow-y-auto min-h-[48px] max-h-[120px]"
+          className="flex-1 px-2 py-3 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-neutral-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed resize-none min-h-[48px] max-h-[120px]"
           onKeyDown={e => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
@@ -184,13 +196,11 @@ export default function ChatInput({
           }}
         />
 
-        {/* Botón de enviar - dentro del input a la derecha */}
-        <div className="flex-shrink-0">
+        {newMessage.trim() ? (
           <button
             type="submit"
-            disabled={!isConnected || !newMessage.trim()}
-            className="p-2 rounded-lg bg-lime-500 hover:bg-lime-600 dark:bg-lime-600 dark:hover:bg-lime-700 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-lime-500 dark:disabled:hover:bg-lime-600"
-            title="Enviar"
+            disabled={!isConnected}
+            className="p-2 rounded-lg bg-lime-500 hover:bg-lime-600 dark:bg-lime-600 dark:hover:bg-lime-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               className="w-5 h-5"
@@ -206,7 +216,18 @@ export default function ChatInput({
               />
             </svg>
           </button>
-        </div>
+        ) : (
+          <button
+            key="thumbup"
+            type="button"
+            onClick={handleSendThumbsUp}
+            disabled={!isConnected}
+            className="w-9 h-9 rounded-full text-xl flex items-center justify-center hover:bg-neutral-300 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Enviar pulgar arriba"
+          >
+            👍
+          </button>
+        )}
       </div>
     </form>
   )

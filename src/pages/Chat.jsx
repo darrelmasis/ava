@@ -21,6 +21,7 @@ export default function Chat() {
     connectionError,
     sendMessage,
     typingUsers,
+    connectedUsers,
     sendTyping,
   } = useChatSocket()
 
@@ -88,7 +89,13 @@ export default function Chat() {
         }}
       />
 
-      <ChatHeader isConnected={isConnected} user={user} />
+      <ChatHeader
+        isConnected={isConnected}
+        user={user}
+        typingUsers={typingUsers}
+        currentUserId={user?._id}
+        connected={connectedUsers}
+      />
       <ChatError message={connectionError} />
 
       <main
@@ -103,13 +110,8 @@ export default function Chat() {
           user={user}
           messagesEndRef={messagesEndRef}
         />
-        <TypingIndicator
-          typingUsers={typingUsers}
-          currentUserId={user?._id || user?.id}
-        />
       </main>
 
-      {/* Indicador de usuarios escribiendo - arriba del input */}
 
       <ChatInput
         newMessage={newMessage}
@@ -117,6 +119,8 @@ export default function Chat() {
         onSendMessage={handleSendMessage}
         isConnected={isConnected}
         sendTyping={sendTyping}
+        sendMessage={sendMessage}
+        user={user}
       />
     </div>
   )

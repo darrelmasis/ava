@@ -1,4 +1,5 @@
 export default function ChatDateSeparator({ date }) {
+  
   const formatDate = dateString => {
     const date = new Date(dateString)
     const today = new Date()
